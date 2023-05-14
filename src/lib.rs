@@ -1,4 +1,4 @@
-use std::{str::FromStr, fmt::Display, num::TryFromIntError};
+use std::{str::FromStr, fmt::Display, num::TryFromIntError, cmp::max};
 
 /// Error thrown on invalid sudoku parsing
 #[derive(Debug)]
@@ -26,7 +26,7 @@ impl Sudoku {
             let mut counts = [0; 9];
             for col in 0..9 {
                 let val = self.table[row][col];
-                counts[(val - 1) as usize] += 1;
+                counts[(max(val, 1) - 1) as usize] += 1;
             }
             if counts.iter().any(|&count| count != 1) {
                 return false;
@@ -37,7 +37,7 @@ impl Sudoku {
             let mut counts = [0; 9];
             for row in 0..9 {
                 let val = self.table[row][col];
-                counts[(val - 1) as usize] += 1;
+                counts[(max(val, 1) - 1) as usize] += 1;
             }
             if counts.iter().any(|&count| count != 1) {
                 return false;
@@ -142,7 +142,7 @@ mod tests {
     }
 
     #[test]
-    fn test_invlid_blocks() {
+    fn test_invalid_3x3_blocks() {
         let sudoku: Sudoku = "123456789\n\
             234567891\n\
             345678912\n\
@@ -152,6 +152,23 @@ mod tests {
             789123456\n\
             891234567\n\
             912345678"
+            .parse()
+            .unwrap();
+        println!("{}", sudoku);
+        assert!(!sudoku.valid());
+    }
+
+    #[test]
+    fn test_invalid_cell() {
+        let sudoku: Sudoku = "123456789\n\
+            456789123\n\
+            789123456\n\
+            214365978\n\
+            365897214\n\
+            897214365\n\
+            531642978\n\
+            642978531\n\
+            978531640"
             .parse()
             .unwrap();
         println!("{}", sudoku);
